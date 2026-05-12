@@ -1,0 +1,223 @@
+components:
+  schemas:
+    # --- ESQUEMAS DE TAREA ---
+    Task:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "645a1b2c3d4e5f6g7h8i9j0"
+        title:
+          type: string
+          example: "Finalizar backend colaborativo"
+        description:
+          type: string
+          example: "Implementar invitaciones por correo y lógica de equipo."
+        completed:
+          type: boolean
+          example: false
+        priority:
+          type: string
+          enum: ["low", "medium", "high"]
+          example: "high"
+        user:
+          type: string
+          description: "ID del usuario propietario (Líder)"
+          example: "645a1b2c3d4e5f6g7h8i9j0"
+        team:
+          type: array
+          description: "IDs de los usuarios invitados al equipo"
+          items:
+            type: string
+          example: ["645a1b2c3d4e5f6g7h8i9j1", "645a1b2c3d4e5f6g7h8i9j2"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TaskInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: "Comprar café para la sesión de despliegue"
+        description:
+          type: string
+          example: "Esencial para sobrevivir al debugging nocturno."
+        priority:
+          type: string
+          enum: ["low", "medium", "high"]
+          default: "medium"
+        completed:
+          type: boolean
+          default: false
+
+    # --- ESQUEMAS DE INVITACIÓN Y COMENTARIOS ---
+    InviteInput:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: "estudiante.putumayo@universidad.edu.co"
+
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+        task:
+          type: string
+        user:
+          type: object
+          properties:
+            _id: string
+            name: string
+        content:
+          type: string
+          example: "Ya terminé el diseño en Figma, pueden revisar."
+        createdAt:
+          type: string
+          format: date-time
+
+    CommentInput:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          example: "He subido los cambios al repositorio."
+
+  responses:
+    UnauthorizedError:
+      description: Token no proporcionado o inválido.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "No autorizado, no hay token"
+    NotFoundError:
+      description: El recurso solicitado no existe.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Recurso no encontrado"
+
+paths:
+  # --- RUTAS DE TAREAS ---
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Obtener tareas (Propias e Invitadas)
+      description: Devuelve la lista de tareas donde el usuario es dueño o colaborador del equipo.
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Lista recuperada exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+
+    post:
+      tags:
+        - Tasks
+      summary: Crear una nueva tarea
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        201:
+          description: Tarea creada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /tasks/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    put:
+      tags:
+        - Tasks
+      summary: Actualizar tarea
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        200:
+          description: Actualizado.
+        404:
+          $ref: "#/components/responses/NotFoundError"
+
+    delete:
+      tags:
+        - Tasks
+      summary: Eliminar tarea
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Eliminado.
+
+  # --- RUTA DE INVITACIONES ---
+  /tasks/{id}/invite:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Tasks
+      summary: Invitar colaborador por email
+      description: El dueño de la tarea invita a un usuario registrado. Se envía notificación por correo.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteInput"
+      responses:
+        200:
+          description: Invitación exitosa.
+        400:
+          description: El usuario ya está en el equipo.
+        404:
+          description: Usuario no registrado en la plataforma.
