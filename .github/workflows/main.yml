@@ -41,6 +41,6 @@ jobs:
       # Definimos las variables de entorno necesarias para que los tests conecten
       env:
         NODE_ENV: test
-        MONGO_URI: mongodb://localhost:27017/task_manager_test
+        MONGO_URI_TEST: mongodb://localhost:27017/task_manager_test
         JWT_SECRET: ${{ secrets.JWT_SECRET_TEST || 'test_secret_key_123' }}
       run: npm test
