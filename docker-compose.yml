@@ -28,5 +28,24 @@ services:
     depends_on:
       - db
 
+  backend:
+    build: .
+    container_name: task-manager-api
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app # <--- ESTO monta tu carpeta local en el contenedor
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/task_manager?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=development
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - FRONTEND_URL=${FRONTEND_URL}
+    depends_on:
+      - db
+
 volumes:
   mongo-data:

@@ -1,5 +1,5 @@
 # 1. Imagen base: Usamos la versión 'slim' para reducir el peso y mejorar la seguridad
-FROM node:18-slim
+FROM node:20-slim
 
 # 2. Crear y definir el directorio de trabajo
 WORKDIR /app
