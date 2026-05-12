@@ -38,7 +38,7 @@ services:
       - .:/app # <--- ESTO monta tu carpeta local en el contenedor
       - /app/node_modules
     environment:
-      - MONGO_URI=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/task_manager?authSource=admin
+      - MONGO_URI_TEST=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/task_manager?authSource=admin
       - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=development
       - EMAIL_USER=${EMAIL_USER}
