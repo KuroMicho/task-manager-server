@@ -14,7 +14,7 @@ const generateTokenAndSetCookie = (res, userId) => {
   res.cookie("jwt", token, {
     httpOnly: true, // No accesible por scripts del cliente (Previene XSS)
     secure: process.env.NODE_ENV !== "development", // Solo HTTPS en producción
-    sameSite: "strict", // Previene ataques de falsificación de solicitudes (CSRF)
+    sameSite: "none", // Se desabilita para permitir cookies en contextos de terceros (CORS)
     maxAge: 30 * 24 * 60 * 60 * 1000, // Vida útil de 30 días
   });
 };
