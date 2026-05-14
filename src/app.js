@@ -8,27 +8,34 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
 
+import { Server } from "socket.io";
+
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { swaggerDocs } from "./config/swagger.js";
+
 import testRoutes from "./routes/testRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
-import { Server } from "socket.io";
 
 dotenv.config();
 
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: true,
+};
+
 const app = express();
+
+// Para ver la IP real del cliente detrás de un proxy (como Nginx o Heroku)
+app.set("trust proxy", 1);
+
 // Crear el servidor HTTP compatible con Sockets
 const server = http.createServer(app);
 
 // Configurar Socket.io con CORS (importante para que tu React lo vea)
 const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
 // Hacer que 'io' sea accesible en tus controladores
@@ -56,6 +63,11 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+// Defínela ANTES de app.use("/api/", limiter) o cámbiale la ruta
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
@@ -66,12 +78,7 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 // CORS: Comunicacion con el Frontend
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    credentials: true,
-  }),
-);
+app.use(cors(corsOptions));
 
 // Parsers: Lectura de JSON y Cookies
 app.use(express.json());
@@ -81,12 +88,6 @@ app.use(cookieParser());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Rutas
-
-// Ruta de salud para verificar que el servidor está activo
-app.get('/api/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
 app.use("/api/v1/test", testRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 app.use("/api/v1/auth", authRoutes);
