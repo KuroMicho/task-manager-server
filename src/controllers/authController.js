@@ -95,6 +95,9 @@ export const logoutUser = (req, res) => {
   // Limpiamos la cookie 'jwt' enviando un valor vacío y expirándola de inmediato
   res.cookie("jwt", "", {
     httpOnly: true,
+    secure: process.env.NODE_ENV !== "development",
+    sameSite: "none",
+    path: "/",
     expires: new Date(0),
   });
 
