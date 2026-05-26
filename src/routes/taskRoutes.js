@@ -7,6 +7,7 @@ import {
   deleteTask,
   inviteByEmail,
   getTaskById,
+  reorderTasks,
 } from "../controllers/taskController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { validate } from "../middleware/validatorMiddleware.js";
@@ -37,22 +38,16 @@ const taskRules = [
  * Prefijo global definido en app.js: /api/v1/tasks
  * Nota: Todas las rutas requieren el middleware 'protect'.
  */
-
-// Obtener todas las tareas y Crear una nueva
 router
   .route("/")
   .get(protect, getTasks)
   .post(protect, taskRules, validate, createTask);
-
-// Actualizar y Eliminar por ID
 router
   .route("/:id")
-  .get(protect, getTaskById) // NUEVO: Obtener detalles de una tarea específica
+  .get(protect, getTaskById)
   .put(protect, taskRules, validate, updateTask)
   .delete(protect, deleteTask);
-
-// NUEVA RUTA: /api/v1/tasks/:id/invite
-// La ponemos como POST porque estamos "enviando" una invitación
-router.post('/:id/invite', protect, inviteByEmail);
+router.post("/:id/invite", protect, inviteByEmail);
+router.route("/reorder").post(protect, reorderTasks);
 
 export default router;

@@ -65,6 +65,32 @@ components:
           example: "kevin@example.com"
 
 paths:
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Obtener perfil del usuario actual
+      description: Devuelve la información del usuario autenticado a partir del token JWT enviado en la petición.
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Perfil del usuario recuperado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        401:
+          description: No autorizado. Token ausente, inválido o expirado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No autorizado, token fallido"
+
   /auth/register:
     post:
       tags:

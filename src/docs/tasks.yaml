@@ -56,17 +56,6 @@ components:
           type: boolean
           default: false
 
-    # --- ESQUEMAS DE INVITACIÓN Y COMENTARIOS ---
-    InviteInput:
-      type: object
-      required:
-        - email
-      properties:
-        email:
-          type: string
-          format: email
-          example: "estudiante.putumayo@universidad.edu.co"
-
     Comment:
       type: object
       properties:
@@ -94,6 +83,35 @@ components:
         content:
           type: string
           example: "He subido los cambios al repositorio."
+
+    # --- ESQUEMAS DE INVITACIÓN Y COMENTARIOS ---
+    InviteInput:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: "estudiante.putumayo@universidad.edu.co"
+
+    # --- ESQUEMA DE REORDENAMIENTO ---
+    ReorderInput:
+      type: object
+      required:
+        - idsOrder
+      properties:
+        idsOrder:
+          type: array
+          description: "Lista ordenada de los ObjectIDs de las tareas tras el Drag & Drop"
+          items:
+            type: string
+          example:
+            [
+              "645a1b2c3d4e5f6g7h8i9j0",
+              "645a1b2c3d4e5f6g7h8i9j1",
+              "645a1b2c3d4e5f6g7h8i9j2",
+            ]
 
   responses:
     UnauthorizedError:
@@ -221,3 +239,42 @@ paths:
           description: El usuario ya está en el equipo.
         404:
           description: Usuario no registrado en la plataforma.
+
+  # --- RUTA DE REORDENAMIENTO (DRAG & DROP) ---
+  /tasks/reorder:
+    post:
+      tags:
+        - Tasks
+      summary: Reordenar posición manual de las tareas
+      description: Actualiza concurrentemente por lotes (`bulkWrite`) el orden de visualización de las tareas según la disposición en el cliente.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderInput"
+      responses:
+        200:
+          description: Posiciones actualizadas y sincronizadas en la base de datos de manera exitosa.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Orden de las tareas actualizado correctamente"
+        400:
+          description: El cuerpo no contiene un array válido de IDs ('idsOrder').
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Se requiere un array válido de IDs ('idsOrder') para reordenar"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"

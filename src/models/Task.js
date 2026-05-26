@@ -6,14 +6,13 @@ import mongoose from "mongoose";
  */
 const taskSchema = new mongoose.Schema(
   {
-    // 🔑 Clave de Propiedad: Vincula la tarea con un usuario específico.
+    // Clave de Propiedad: Vincula la tarea con un usuario específico.
     // Sin esto, no podríamos implementar la seguridad de "solo mis tareas".
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User", // Referencia al modelo User
     },
-    // 👥 NUEVO: Array de colaboradores invitados
     team: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -44,12 +43,16 @@ const taskSchema = new mongoose.Schema(
       },
       default: "medium",
     },
+    order: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     // Gestiona automáticamente la creación y actualización de fechas
     timestamps: true,
     collection: "tasks",
-    // 💡 IMPORTANTE: Esto permite que los campos virtuales se incluyan en el JSON
+    // IMPORTANTE: Esto permite que los campos virtuales se incluyan en el JSON
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },

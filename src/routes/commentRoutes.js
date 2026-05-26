@@ -26,16 +26,12 @@ const commentRules = [
 
 /**
  * DEFINICIÓN DE RUTAS
- * Estas rutas se montarán en app.js como: /api/v1/tasks/:taskId/comments
+ * Prefijo global definido en app.js: /api/v1/tasks/:taskId/comments
  */
-
-// Obtener y Crear comentarios para una tarea específica
 router
   .route("/")
   .get(protect, getComments)
   .post(protect, commentRules, validate, createComment);
-
-// Editar y Eliminar un comentario específico por su ID
 router
   .route("/:id")
   .put(protect, commentRules, validate, updateComment)

@@ -13,8 +13,8 @@ export const getTasks = asyncHandler(async (req, res) => {
     $or: [{ user: req.user._id }, { team: req.user._id }],
   })
     .populate("user", "name email")
-    .populate("commentCount"); // Trae solo el número de comentarios
-
+    .populate("commentCount") // Trae solo el número de comentarios
+    .sort({ order: 1 });
   res.status(200).json(tasks);
 });
 
@@ -113,6 +113,41 @@ export const deleteTask = asyncHandler(async (req, res) => {
 
   await task.deleteOne();
   res.status(200).json({ message: "Tarea eliminada correctamente" });
+});
+
+/**
+ * @desc    Reordenar la posición manual de las tareas
+ * @route   POST /api/v1/tasks/reorder
+ * @access  Private
+ */
+export const reorderTasks = asyncHandler(async (req, res) => {
+  const { idsOrder } = req.body;
+
+  if (!idsOrder || !Array.isArray(idsOrder)) {
+    res.status(400);
+    throw new Error(
+      "Se requiere un array válido de IDs ('idsOrder') para reordenar",
+    );
+  }
+
+  // Creamos un lote de operaciones concurrentes (bulk write) para maximizar el rendimiento
+  const bulkOperations = idsOrder.map((id, index) => ({
+    updateOne: {
+      filter: {
+        _id: id,
+        // Garantizamos por seguridad que el usuario solo altere sus propias tareas o colaboraciones
+        $or: [{ user: req.user._id }, { team: req.user._id }],
+      },
+      update: { $set: { order: index } },
+    },
+  }));
+
+  // Ejecutamos de manera eficiente en la base de datos
+  await Task.bulkWrite(bulkOperations);
+
+  res
+    .status(200)
+    .json({ message: "Orden de las tareas actualizado correctamente" });
 });
 
 /**
