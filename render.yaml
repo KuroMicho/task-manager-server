@@ -6,27 +6,25 @@ services:
     region: ohio
     dockerContext: .
     dockerfilePath: ./Dockerfile
-    
-    # HEALTH CHECK: Render esperará a que este endpoint responda 200 OK 
+
+    # HEALTH CHECK: Render esperará a que este endpoint responda 200 OK
     # antes de dar por exitoso el despliegue.
     healthCheckPath: /health
 
     envVars:
       - key: NODE_ENV
         value: production
-      
-      # VARIABLES OCULTAS: 
-      # Al usar 'sync: false', Render crea el espacio en el Dashboard, 
+
+      # VARIABLES OCULTAS:
+      # Al usar 'sync: false', Render crea el espacio en el Dashboard,
       # pero tú debes pegar el valor manualmente allá una sola vez.
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
         sync: false
-      - key: EMAIL_USER
+      - key: RESEND_API_KEY
         sync: false
-      - key: EMAIL_PASS
-        sync: false
-        
+
       # Variables públicas
       - key: FRONTEND_URL
         value: https://tu-frontend.onrender.com

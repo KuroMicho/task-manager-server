@@ -1,47 +1,34 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-let transporter;
-
-if (process.env.NODE_ENV !== "test") {
-  transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    pool: true,
-    connectionTimeout: 10000,
-    dnsLookup: (hostname, options, callback) => {
-      return dns.lookup(hostname, { family: 4 }, callback);
-    },
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-      minVersion: "TLSv1.2",
-    },
-  });
-}
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 const sendEmail = async (options) => {
   if (process.env.NODE_ENV === "test") {
-    console.log("🧪 Modo Test: Simulando envío de correo a:", options.email);
-    return { messageId: "test-123" };
+    console.log("Modo Test: Simulando envío con Resend a:", options.email);
+    return { id: "test-123" };
   }
 
-  const mailOptions = {
-    from: `"Tablero Colaborativo" <${process.env.EMAIL_USER}>`,
-    to: options.email,
-    subject: options.subject,
-    html: options.message,
-  };
+  if (!resend) {
+    console.error("Resend no ha sido inicializado. Falta RESEND_API_KEY.");
+    throw new Error("Servicio de mensajería no configurado");
+  }
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ ¡Correo enviado a ${options.email} con éxito!`);
-    return info;
+    const data = await resend.emails.send({
+      from: "Tablero Colaborativo <onboarding@resend.dev>",
+      to: options.email,
+      subject: options.subject,
+      html: options.message,
+    });
+
+    console.log(
+      `¡Correo gestionado por Resend enviado con éxito a ${options.email}! ID: ${data.id}`,
+    );
+    return data;
   } catch (error) {
-    console.error("❌ Error en el servicio de mensajería:", error.message);
+    console.error("❌ Error en la pasarela de Resend:", error.message);
     throw error;
   }
 };
