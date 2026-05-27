@@ -9,7 +9,7 @@ services:
     
     # HEALTH CHECK: Render esperará a que este endpoint responda 200 OK 
     # antes de dar por exitoso el despliegue.
-    healthCheckPath: /api/health
+    healthCheckPath: /health
 
     envVars:
       - key: NODE_ENV

@@ -1,4 +1,4 @@
-# 1. Imagen base: Usamos la versión 'slim' para reducir el peso y mejorar la seguridad
+# 1. Imagen base: Usamos la versión 'alpine' ultra-ligera para reducir el peso y mejorar la seguridad
 FROM node:24-alpine
 
 # 2. Crear y definir el directorio de trabajo
@@ -17,7 +17,7 @@ COPY . .
 
 # 6. Exponer el puerto en el que corre tu app
 # Render asignará su propio puerto, pero esto sirve como documentación y puente
-EXPOSE 3000
+EXPOSE 10000
 
 # 7. Comando de arranque
 # Asegúrate de tener definido un script "start" en tu package.json (ej: "node src/server.js")
