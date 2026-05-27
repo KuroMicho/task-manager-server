@@ -1,45 +1,45 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-dotenv.config();
 
-const sendEmail = async (options) => {
-  // SI ESTAMOS EN TEST, NO HACEMOS NADA REAL
-  if (process.env.NODE_ENV === 'test') {
-    console.log("🧪 Modo Test: Simulando envío de correo a:", options.email);
-    return { messageId: 'test-123' };
-  }
+let transporter;
 
-  const transporter = nodemailer.createTransport({
+if (process.env.NODE_ENV !== "test") {
+  transporter = nodemailer.createTransport({
     service: "gmail",
-    port: 587,
-    secure: false,
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
     tls: {
-      // Esto es vital para que la conexión no se cuelgue en redes locales
       rejectUnauthorized: false,
-      minVersion: "TLSv1.2",
     },
   });
+}
+
+const sendEmail = async (options) => {
+  if (process.env.NODE_ENV === "test") {
+    console.log("🧪 Modo Test: Simulando envío de correo a:", options.email);
+    return { messageId: "test-123" };
+  }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: `"Tablero Colaborativo" <${process.env.EMAIL_USER}>`,
     to: options.email,
     subject: options.subject,
     html: options.message,
   };
 
   try {
-    console.log("⏳ Verificando conexión con Gmail...");
-    await transporter.verify();
-
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ ¡Correo enviado con éxito!");
+    console.log(`✅ ¡Correo enviado a ${options.email} con éxito!`);
     return info;
   } catch (error) {
-    console.error("❌ Error en localhost:", error.message);
+    console.error("❌ Error en el servicio de mensajería:", error.message);
     throw error;
   }
 };

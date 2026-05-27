@@ -4,9 +4,6 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 import Task from "../models/Task.js";
 import Comment from "../models/Comment.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 // 💡 EL MOCK DEBE IR AQUÍ, ANTES DE IMPORTAR 'app'
 jest.mock("../utils/sendEmail.js", () => {

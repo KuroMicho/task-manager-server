@@ -5,9 +5,6 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 import Task from "../models/Task.js";
 import Comment from "../models/Comment.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 describe("Pruebas de Comentarios (Nested Routes + Sockets)", () => {
   let authCookie = "";

@@ -1,9 +1,6 @@
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
-// Cambia la importación para traer el server
 import { app, server } from "./app.js";
-
-dotenv.config();
 
 const startServer = async () => {
   try {
