@@ -9,6 +9,9 @@ if (process.env.NODE_ENV !== "test") {
     secure: false,
     pool: true,
     connectionTimeout: 10000,
+    dnsLookup: (hostname, options, callback) => {
+      return dns.lookup(hostname, { family: 4 }, callback);
+    },
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
