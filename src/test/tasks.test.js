@@ -5,12 +5,12 @@ import User from "../models/User.js";
 import Task from "../models/Task.js";
 import Comment from "../models/Comment.js";
 
-// 💡 EL MOCK DEBE IR AQUÍ, ANTES DE IMPORTAR 'app'
+// EL MOCK DEBE IR AQUÍ, ANTES DE IMPORTAR 'app'
 jest.mock("../utils/sendEmail.js", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
-      console.log("✅ Mock de correo ejecutado exitosamente");
+      console.log("Mock de correo ejecutado exitosamente");
       return Promise.resolve({ messageId: "test-id" });
     }),
   };

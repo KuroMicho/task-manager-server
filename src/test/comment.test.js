@@ -75,7 +75,7 @@ describe("Pruebas de Comentarios (Nested Routes + Sockets)", () => {
         "Este es un comentario de prueba con sockets",
       );
 
-      // ✅ VERIFICACIÓN DE SOCKET: Comprobamos que el controlador intentó avisar al equipo
+      // VERIFICACIÓN DE SOCKET: Comprobamos que el controlador intentó avisar al equipo
       expect(mockIo.to).toHaveBeenCalledWith(taskId.toString());
       expect(mockIo.emit).toHaveBeenCalledWith(
         "receive_comment",

@@ -27,8 +27,8 @@ const corsOptions = {
   origin: [
     "http://localhost:5173", // Vite Dev Local
     "http://localhost:3000", // React Router Serve (CI de GitHub / Docker)
-    "https://tu-app-frontend.onrender.com", // Producción Real
-  ],
+    process.env.FRONTEND_URL, // Producción Real (Render)
+  ].filter(Boolean), // Remueve dinámicamente cualquier elemento 'undefined' o vacío
   credentials: true,
 };
 
