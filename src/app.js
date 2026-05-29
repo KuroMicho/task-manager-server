@@ -24,7 +24,11 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: [
+    "http://localhost:5173", // Vite Dev Local
+    "http://localhost:3000", // React Router Serve (CI de GitHub / Docker)
+    "https://tu-app-frontend.onrender.com", // Producción Real
+  ],
   credentials: true,
 };
 
